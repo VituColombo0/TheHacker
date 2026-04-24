@@ -1,0 +1,21 @@
+tools:
+  - strix
+  - shannon
+  - nuclei
+  - mobsf
+  - trufflehog
+  - gitleaks
+  - trivy
+  - semgrep
+
+settings:
+  strix:
+    scan_mode: quick
+  shannon:
+    mode: autonomous
+  nuclei:
+    severity: high,critical
+  mobsf:
+    dynamic_analysis: false
+  trivy:
+    scanners: vuln,secret,misconfig
