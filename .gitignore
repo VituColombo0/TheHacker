@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env
+
+# Reports
+reports/
+*.json
+*.html
+*.txt
+
+# Tool specific
+.strix/
+.nuclei/
+.mobsf/
+
+# OS
+.DS_Store
+Thumbs.db
