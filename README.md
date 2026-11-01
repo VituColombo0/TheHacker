@@ -1,115 +1,191 @@
-# 🛡️ TheHacker - Advanced Security Orchestration Engine
+# TheHacker: Security Scan Orchestration Engine
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.10%2B-green.svg)
-![Status](https://img.shields.io/badge/status-active-success.svg)
-![Security](https://img.shields.io/badge/security-orchestration-blueviolet.svg)
+A modular command-line orchestration engine for automated security testing across web applications, mobile packages, and local source repositories.
 
-**TheHacker** is a powerful, all-in-one security orchestration platform designed to automate and simplify the process of vulnerability assessment across multiple domains. Whether you are testing a **Web Application**, a **Mobile App**, or a **Local Codebase**, TheHacker combines the world's best security tools into a single, unified workflow.
-
----
-
-## ✨ Key Features
-
-- **🚀 Multi-Target Support**: Automatically detects and handles Web URLs, Local Directories, and Mobile Files (.apk, .ipa).
-- **🤖 AI-Powered Analysis**: Integrated with state-of-the-art AI pen-testing tools like Strix and Shannon.
-- **🛠️ Extensible Tool Factory**: Modular architecture allowing for easy integration of any CLI-based security tool.
-- **🎨 Premium CLI Interface**: Beautifully formatted output with progress bars, tables, and rich logging.
-- **⚙️ Flexible Configuration**: Highly customizable toolchain through YAML configurations.
+[![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![CLI: Rich](https://img.shields.io/badge/Interface-Rich%20CLI-blueviolet.svg)](https://github.com/Textualize/rich)
+[![Docker: Required](https://img.shields.io/badge/Containers-Docker%20Sandboxed-2496ED.svg)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## 🛠️ Integrated Tools
+## Overview
 
-| Category | Tool | Description |
-| :--- | :--- | :--- |
-| **Web / API** | **Strix** | AI-driven autonomous penetration testing and PoC validation. |
-| **Web / API** | **Shannon** | Real-time AI white-box pentesting and source code analysis. |
-| **Web / API** | **Nuclei** | Fast, template-based vulnerability scanning from the community. |
-| **Mobile** | **MobSF** | Static and dynamic analysis for Android & iOS applications. |
-| **Secrets** | **Gitleaks** | Find passwords, API keys, and tokens in your local code. |
-| **Secrets** | **TruffleHog** | Scan for verified credentials leaked in Git history or filesystems. |
-| **Code (SAST)** | **Semgrep** | Static analysis to find complex logic bugs and security flaws. |
-| **Containers**| **Trivy** | Vulnerability scanner for OS packages, dependencies, and misconfigs. |
+**TheHacker** unifies heterogeneous security scanners into a single execution pipeline. It automatically identifies the target type (URL, mobile binary, or source directory), resolves applicable analyzers through a declarative factory pattern, and runs the assessment sequentially with real-time status tracking and report aggregation.
+
+```
+                     Target Input (URL, Directory, APK/IPA)
+                                       │
+                                       ▼
+                            [ Target Detection ]
+                         Auto-identifies target type
+                                       │
+                                       ▼
+                       [ Configuration & Factory ]
+                      Loads config/default.yaml or CLI
+                                       │
+         ┌─────────────────────────────┼─────────────────────────────┐
+         ▼                             ▼                             ▼
+    [ Web / API ]                 [ Mobile ]                  [ SAST / Secrets ]
+   Nuclei, Strix,             MobSF (Docker)               Semgrep, Gitleaks,
+   Shannon                                                 TruffleHog, Trivy
+         │                             │                             │
+         └─────────────────────────────┼─────────────────────────────┘
+                                       │
+                                       ▼
+                             [ Rich Execution Engine ]
+                                Progress & Logging
+                                       │
+                                       ▼
+                               [ reports/ Directory ]
+```
 
 ---
 
-## 🚀 Quick Start
+## Tool Matrix
 
-### Prerequisites
+| Domain | Scanner | Purpose | Runtime |
+| :--- | :--- | :--- | :--- |
+| **Web / API** | **Nuclei** | Template-driven protocol and vulnerability scanning | Native binary / Go |
+| **Web / API** | **Strix** | Autonomous agent-assisted dynamic penetration testing | Docker container |
+| **Web / API** | **Shannon** | White-box source security analysis and verification | Docker container |
+| **Mobile** | **MobSF** | Static (SAST) and dynamic analysis for Android (.apk) & iOS (.ipa) | Docker container |
+| **Secrets** | **Gitleaks** | Pattern matching for hardcoded secrets in git history | Native binary / Go |
+| **Secrets** | **TruffleHog** | High-entropy secret and credential scanning with API verification | Native binary / Go |
+| **Code (SAST)**| **Semgrep** | Fast semantic static analysis for vulnerability patterns | Python / Native |
+| **Containers** | **Trivy** | Vulnerability scanning for dependencies, SBOMs, and misconfigurations | Native binary / Go |
 
-- **Python 3.10+**
-- **Docker** (Required for Strix and MobSF sandboxes)
+---
+
+## Prerequisites
+
+- **Python 3.10** or higher
+- **Docker Engine** running locally (required for sandboxed scanners like MobSF and Strix)
 - **Git**
 
-### Installation
+---
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/VituColombo0/TheHacker.git
-   cd TheHacker
-   ```
+## Installation
 
-2. Set up the virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   pip install -r requirements.txt
-   ```
-
-### Basic Usage
-
-**Scan a Web Application:**
 ```bash
-python main.py --target https://your-app.com
+# Clone the repository
+git clone https://github.com/VituColombo0/TheHacker.git
+cd TheHacker
+
+# Create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-**Scan a Local Directory:**
-```bash
-python main.py --target ./path/to/source
+---
+
+## Usage
+
+### Command-Line Arguments
+
+```text
+usage: main.py [-h] [--target TARGET] [--config CONFIG] [--interactive]
+
+TheHacker - Advanced Security Orchestration
+
+options:
+  -h, --help       show this help message and exit
+  --target TARGET  Target URL, Directory, or Mobile App file
+  --config CONFIG  Path to YAML config file (default: config/default.yaml)
+  --interactive    Interactively select which tools to execute
 ```
 
-**Scan a Mobile App:**
+### Examples
+
+**Analyze a Web Application:**
 ```bash
-python main.py --target ./app.apk
+python main.py --target https://example.com
 ```
 
-**Interactive Mode:**
+**Audit a Local Repository:**
+```bash
+python main.py --target /path/to/source-code
+```
+
+**Scan an Android Package:**
+```bash
+python main.py --target ./dist/app.apk
+```
+
+**Interactive Tool Selection:**
 ```bash
 python main.py --interactive
 ```
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-You can customize the toolchain in `config/default.yaml`. Enable or disable tools based on your needs:
+Custom tool chains are configured in YAML format. Default behavior can be overridden via `config/default.yaml` or a custom configuration file:
 
 ```yaml
+# config/custom.yaml
 tools:
-  - strix
   - nuclei
+  - gitleaks
+  - semgrep
   - trufflehog
-  # - mobsf (disabled for local code scan)
+  # Exclude heavy runners when running in lightweight CI:
+  # - mobsf
+  # - strix
+```
+
+Pass the custom file using the `--config` flag:
+```bash
+python main.py --target ./src --config config/custom.yaml
 ```
 
 ---
 
-## 🤝 Contributing
+## Architecture & Adding New Scanners
 
-We welcome contributions! If you have a tool you'd like to integrate:
-1. Create a new wrapper in `tools/`.
-2. Inherit from `BaseTool`.
-3. Register it in `ToolFactory`.
+The orchestration engine uses a pluggable `ToolFactory` pattern. To add a new scanner:
+
+1. Create a wrapper file in `tools/` (e.g., `tools/my_scanner.py`):
+   ```python
+   from tools.base import BaseTool
+
+   class MyScanner(BaseTool):
+       name = "my_scanner"
+
+       def run(self):
+           # Implement scan invocation and report generation
+           pass
+   ```
+2. Inherit from `BaseTool` and implement required execution methods.
+3. Register the class in `tools/factory.py`.
+4. Add the tool identifier to `config/default.yaml`.
 
 ---
 
-## 📜 License
+## Project Structure
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```text
+TheHacker/
+├── config/
+│   └── default.yaml         # Toolchain configuration
+├── tools/
+│   ├── base.py              # BaseTool abstract interface
+│   ├── factory.py           # ToolFactory dynamic loader
+│   ├── nuclei.py            # Nuclei wrapper
+│   ├── mobsf.py             # MobSF container wrapper
+│   └── ...                  # Additional scanner modules
+├── reports/                 # Output artifacts and scanner logs
+├── main.py                  # CLI entrypoint and argument parser
+├── requirements.txt         # Python package dependencies
+└── README.md                # Documentation
+```
 
 ---
 
-<p align="center">
-  Made with ❤️ by VituColombo0
-</p>
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
